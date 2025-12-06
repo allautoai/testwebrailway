@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Validator - Test</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+    
+    .badge {
+      display: inline-block;
+      background: #10b981;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    textarea {
+      min-height: 120px;
+      font-family: monospace;
+      resize: vertical;
+    }
+    
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-right: 10px;
+    }
+    
+    button:hover {
+      background: #5568d3;
+    }
+    
+    button:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+    
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .result.valid {
+      border-left-color: #10b981;
+      background: #f0fdf4;
+    }
+    
+    .result.invalid {
+      border-left-color: #ef4444;
+      background: #fef2f2;
+    }
+    
+    .result-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .icon {
+      font-size: 20px;
+    }
+    
+    .check-item {
+      padding: 8px;
+      margin: 4px 0;
+      background: white;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .status {
+      font-weight: 600;
+    }
+    
+    .status.pass {
+      color: #10b981;
+    }
+    
+    .status.fail {
+      color: #ef4444;
+    }
+    
+    .suggestion {
+      margin-top: 16px;
+      padding: 12px;
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      border-radius: 6px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 30px;
+    }
+    
+    .stat-card {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      color: #666;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .tab {
+      background: none;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #666;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📧 Email Validator <span class="badge">LIVE</span></h1>
+    <p class="subtitle">Test your email validation API • Deployed on Railway</p>
+    
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('single')">Single Email</button>
+      <button class="tab" onclick="switchTab('bulk')">Bulk Validation</button>
+      <button class="tab" onclick="switchTab('stats')">Statistics</button>
+    </div>
+    
+    <!-- Single Email Tab -->
+    <div id="single-tab" class="tab-content active">
+      <div class="input-group">
+        <label>Enter email to validate:</label>
+        <input type="email" id="email-input" placeholder="example@gmail.com" />
+      </div>
+      
+      <button onclick="validateSingle()">
+        <span id="single-btn-text">Validate Email</span>
+      </button>
+      
+      <div id="single-result"></div>
+    </div>
+    
+    <!-- Bulk Tab -->
+    <div id="bulk-tab" class="tab-content">
+      <div class="input-group">
+        <label>Enter emails (one per line):</label>
+        <textarea id="bulk-input" placeholder="email1@example.com
+email2@gmail.com
+email3@yahoo.com"></textarea>
+      </div>
+      
+      <button onclick="validateBulk()">
+        <span id="bulk-btn-text">Validate All</span>
+      </button>
+      
+      <div id="bulk-result"></div>
+    </div>
+    
+    <!-- Stats Tab -->
+    <div id="stats-tab" class="tab-content">
+      <button onclick="loadStats()">Refresh Statistics</button>
+      <div id="stats-container"></div>
+    </div>
+  </div>
+  
+  <script>
+    function switchTab(tab) {
+      // Update tab buttons
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById(tab + '-tab').classList.add('active');
+      
+      // Load stats if stats tab
+      if (tab === 'stats') {
+        loadStats();
+      }
+    }
+    
+    async function validateSingle() {
+      const email = document.getElementById('email-input').value;
+      const resultDiv = document.getElementById('single-result');
+      const btnText = document.getElementById('single-btn-text');
+      
+      if (!email) {
+        alert('Please enter an email');
+        return;
+      }
+      
+      btnText.innerHTML = '<span class="loading"></span>';
+      
+      try {
+        const response = await fetch('/api/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        
+        resultDiv.innerHTML = `
+          <div class="result ${data.isValid ? 'valid' : 'invalid'}">
+            <div class="result-title">
+              <span class="icon">${data.isValid ? '✅' : '❌'}</span>
+              <span>${data.isValid ? 'Valid Email' : 'Invalid Email'}</span>
+            </div>
+            
+            <div class="check-item">
+              <span>Email: <strong>${data.email}</strong></span>
+            </div>
+            
+            <div style="margin-top: 16px;">
+              <strong>Validation Checks:</strong>
+              <div class="check-item">
+                <span>Syntax Check</span>
+                <span class="status ${data.checks.syntax ? 'pass' : 'fail'}">
+                  ${data.checks.syntax ? '✓ Pass' : '✗ Fail'}
+                </span>
+              </div>
+              <div class="check-item">
+                <span>Has @ Symbol</span>
+                <span class="status ${data.checks.hasAt ? 'pass' : 'fail'}">
+                  ${data.checks.hasAt ? '✓ Pass' : '✗ Fail'}
+                </span>
+              </div>
+              <div class="check-item">
+                <span>Has Domain</span>
+                <span class="status ${data.checks.hasDomain ? 'pass' : 'fail'}">
+                  ${data.checks.hasDomain ? '✓ Pass' : '✗ Fail'}
+                </span>
+              </div>
+              <div class="check-item">
+                <span>Valid Domain Format</span>
+                <span class="status ${data.checks.validDomain ? 'pass' : 'fail'}">
+                  ${data.checks.validDomain ? '✓ Pass' : '✗ Fail'}
+                </span>
+              </div>
+            </div>
+            
+            ${data.suggestion ? `
+              <div class="suggestion">
+                <strong>💡 Suggestion:</strong> Did you mean <strong>${data.suggestion}</strong>?
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <div class="result invalid">
+            <div class="result-title">❌ Error</div>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+      
+      btnText.textContent = 'Validate Email';
+    }
+    
+    async function validateBulk() {
+      const input = document.getElementById('bulk-input').value;
+      const resultDiv = document.getElementById('bulk-result');
+      const btnText = document.getElementById('bulk-btn-text');
+      
+      const emails = input.split('\n').map(e => e.trim()).filter(e => e);
+      
+      if (emails.length === 0) {
+        alert('Please enter at least one email');
+        return;
+      }
+      
+      btnText.innerHTML = '<span class="loading"></span>';
+      
+      try {
+        const response = await fetch('/api/validate-bulk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ emails })
+        });
+        
+        const data = await response.json();
+        
+        const resultsHtml = data.results.map(r => `
+          <div class="check-item">
+            <span>${r.isValid ? '✅' : '❌'} ${r.email}</span>
+            ${r.suggestion ? `<span style="color: #f59e0b;">→ ${r.suggestion}</span>` : ''}
+          </div>
+        `).join('');
+        
+        resultDiv.innerHTML = `
+          <div class="result">
+            <div class="result-title">Bulk Validation Results</div>
+            
+            <div class="stats" style="margin-bottom: 20px;">
+              <div class="stat-card">
+                <div class="stat-value">${data.stats.total}</div>
+                <div class="stat-label">Total</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" style="color: #10b981;">${data.stats.valid}</div>
+                <div class="stat-label">Valid</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" style="color: #ef4444;">${data.stats.invalid}</div>
+                <div class="stat-label">Invalid</div>
+              </div>
+            </div>
+            
+            <div style="max-height: 400px; overflow-y: auto;">
+              ${resultsHtml}
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <div class="result invalid">
+            <div class="result-title">❌ Error</div>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+      
+      btnText.textContent = 'Validate All';
+    }
+    
+    async function loadStats() {
+      const container = document.getElementById('stats-container');
+      container.innerHTML = '<p>Loading...</p>';
+      
+      try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+        
+        if (data.message) {
+          container.innerHTML = `
+            <div class="result">
+              <p>${data.message}</p>
+              <p style="margin-top: 10px; color: #666;">
+                Add a PostgreSQL database in Railway to track statistics.
+              </p>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <div class="stats">
+              <div class="stat-card">
+                <div class="stat-value">${data.totalChecks}</div>
+                <div class="stat-label">Total Checks</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" style="color: #10b981;">${data.validEmails}</div>
+                <div class="stat-label">Valid Emails</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value" style="color: #ef4444;">${data.invalidEmails}</div>
+                <div class="stat-label">Invalid Emails</div>
+              </div>
+            </div>
+          `;
+        }
+      } catch (error) {
+        container.innerHTML = `
+          <div class="result invalid">
+            <p>Error loading stats: ${error.message}</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Allow Enter key to submit
+    document.getElementById('email-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') validateSingle();
+    });
+  </script>
+</body>
+</html>
